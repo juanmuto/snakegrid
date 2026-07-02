@@ -4,4 +4,7 @@ Shift: Moves every room forward or backward through the snake sequence by that m
 
 Rotate: Spins the entire current grid layout 90° CW or CCW. This is applied on top of the shift, so you can combine any pattern + shift + rotation freely.
 
+Ring rotations — three independent controls, one per ring. Outer (24 cells), Middle (16 cells), Inner (8 cells). Each rotates clockwise with positive steps, counter-clockwise with negative. The center stays fixed. Ring rotations stack on top of the snake shift and before the grid rotation.
+Trip highlights — pick Trip 1 (yellow), Trip 2 (teal), or Trip 3 (red) from the panel, then click any cell on the grid to tag it. Click again to untag. A cell can belong to multiple trips at once (shown as a diagonal split). Highlights follow the room ID, not the grid position — so as you shift, rotate rings or rotate the whole grid, the colours move with the rooms. "None" mode lets you erase highlights from individual cells, and "Clear all" resets everything.
+
 The border pills at the bottom show you exactly which rooms are on each edge at any moment
