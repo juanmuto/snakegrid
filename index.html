@@ -3,87 +3,148 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Snake Grid Navigator</title>
+<title>Snake Grid Navigator v2</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:system-ui,sans-serif;background:#f5f5f2;color:#1a1a18;padding:16px}
-.wrap{max-width:700px;margin:0 auto}
-h1{font-size:16px;font-weight:500;margin-bottom:12px;color:#1a1a18}
-.toolbar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;align-items:center}
-label.sec{font-size:11px;color:#73726c;white-space:nowrap}
-.btn-group{display:flex;gap:2px;flex-wrap:wrap}
-.btn{font-size:11px;padding:4px 9px;border:0.5px solid #b4b2a9;border-radius:6px;background:#fff;color:#1a1a18;cursor:pointer;white-space:nowrap;line-height:1.4}
+body{font-family:system-ui,sans-serif;background:#f5f5f2;color:#1a1a18;padding:16px;font-size:13px}
+.wrap{max-width:740px;margin:0 auto}
+h1{font-size:15px;font-weight:600;margin-bottom:12px}
+.section{margin-bottom:10px}
+.section-title{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#888780;margin-bottom:5px}
+.row{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.btn{font-size:11px;padding:4px 9px;border:1px solid #c5c3ba;border-radius:6px;background:#fff;color:#1a1a18;cursor:pointer;line-height:1.4;white-space:nowrap}
 .btn:hover{background:#f1efe8}
 .btn.active{background:#e6f1fb;color:#185fa5;border-color:#85b7eb}
-.sep{width:0.5px;background:#d3d1c7;height:24px;margin:0 4px;align-self:center}
-.shift-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}
-.shift-counter{font-size:13px;font-weight:500;min-width:60px;text-align:center}
-.grid-wrap{overflow-x:auto}
-.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;min-width:280px}
-.cell{border:0.5px solid #d3d1c7;border-radius:4px;padding:3px 2px;min-height:52px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;background:#f1efe8}
-.cell.center-cell{background:#eeedfe;border-color:#afa9ec}
-.cell .cid{font-size:9px;color:#888780;line-height:1.2}
+.btn.sm{padding:3px 7px;font-size:10px}
+.counter{font-size:12px;font-weight:500;min-width:32px;text-align:center;background:#f1efe8;border:1px solid #c5c3ba;border-radius:5px;padding:3px 6px}
+.sep{width:1px;background:#d3d1c7;height:22px;margin:0 2px;align-self:center}
+.ring-row{display:flex;align-items:center;gap:6px;margin-bottom:4px}
+.ring-label{font-size:11px;width:90px;color:#5f5e5a;flex-shrink:0}
+/* grid */
+.grid-wrap{overflow-x:auto;margin:10px 0}
+.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;min-width:300px}
+.cell{border:1px solid #d3d1c7;border-radius:5px;padding:2px;min-height:54px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;background:#fff;transition:background .1s;position:relative;cursor:pointer;user-select:none}
+.cell:hover{border-color:#888}
+.cell .cid{font-size:8px;color:#999;line-height:1.2}
 .cell .cname{font-size:9px;font-weight:500;color:#1a1a18;line-height:1.3;word-break:break-word}
+.cell.center-cell{background:#eeedfe;border-color:#afa9ec}
 .cell.center-cell .cname{color:#3c3489}
-.cell.west-edge{border-left:2px solid #1D9E75}
-.cell.east-edge{border-right:2px solid #1D9E75}
-.cell.north-edge{border-top:2px solid #1D9E75}
-.cell.south-edge{border-bottom:2px solid #1D9E75}
-.info-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
-.info-pill{font-size:10px;padding:2px 8px;border-radius:99px;border:0.5px solid #d3d1c7;color:#5f5e5a;background:#fff}
-.mode-label{font-size:11px;font-weight:500;color:#185fa5;margin-left:4px}
+.cell.west-edge{border-left:2.5px solid #1D9E75}
+.cell.east-edge{border-right:2.5px solid #1D9E75}
+.cell.north-edge{border-top:2.5px solid #1D9E75}
+.cell.south-edge{border-bottom:2.5px solid #1D9E75}
+/* trip highlights */
+.cell.t1{background:#FFF3CD;border-color:#d4a01a}
+.cell.t1 .cname,.cell.t1 .cid{color:#7a5800}
+.cell.t2{background:#D1ECF1;border-color:#1a85a0}
+.cell.t2 .cname,.cell.t2 .cid{color:#0a4f60}
+.cell.t3{background:#F8D7DA;border-color:#b02a37}
+.cell.t3 .cname,.cell.t3 .cid{color:#6a0c14}
+/* combined — show stripes if multiple trips */
+.cell.t1.t2{background:linear-gradient(135deg,#FFF3CD 50%,#D1ECF1 50%)}
+.cell.t1.t3{background:linear-gradient(135deg,#FFF3CD 50%,#F8D7DA 50%)}
+.cell.t2.t3{background:linear-gradient(135deg,#D1ECF1 50%,#F8D7DA 50%)}
+/* trip selector panel */
+.trip-panel{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:6px}
+.trip-btn{font-size:11px;padding:3px 10px;border-radius:6px;border:1.5px solid;cursor:pointer;font-weight:500}
+.trip-btn.t1-btn{background:#FFF3CD;border-color:#d4a01a;color:#7a5800}
+.trip-btn.t2-btn{background:#D1ECF1;border-color:#1a85a0;color:#0a4f60}
+.trip-btn.t3-btn{background:#F8D7DA;border-color:#b02a37;color:#6a0c14}
+.trip-btn.sel{box-shadow:0 0 0 2px #1a1a18}
+.trip-btn.none-btn{background:#f1efe8;border-color:#c5c3ba;color:#5f5e5a}
+.trip-btn.none-btn.sel{box-shadow:0 0 0 2px #1a1a18}
+.hint{font-size:10px;color:#888780;margin-left:4px}
+/* info pills */
+.info-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.info-pill{font-size:10px;padding:2px 8px;border-radius:99px;border:1px solid #d3d1c7;color:#5f5e5a;background:#fff}
+.clear-btn{font-size:10px;padding:2px 7px;border:1px solid #c5c3ba;border-radius:5px;background:#fff;color:#b02a37;cursor:pointer}
+.clear-btn:hover{background:#F8D7DA}
+
 @media(prefers-color-scheme:dark){
   body{background:#1c1c1a;color:#e0ded6}
-  .btn{background:#2c2c2a;color:#e0ded6;border-color:#444441}
+  .btn{background:#2c2c2a;color:#e0ded6;border-color:#555552}
   .btn:hover{background:#3a3a38}
   .btn.active{background:#0c447c;color:#b5d4f4;border-color:#378add}
+  .counter{background:#2c2c2a;border-color:#555552;color:#e0ded6}
   .cell{background:#2c2c2a;border-color:#444441}
   .cell .cname{color:#e0ded6}
+  .cell .cid{color:#888780}
   .cell.center-cell{background:#26215c;border-color:#534ab7}
   .cell.center-cell .cname{color:#cecbf6}
-  .cell .cid{color:#888780}
-  .info-pill{background:#2c2c2a;border-color:#444441;color:#b4b2a9}
-  .sep{background:#444441}
-  h1{color:#e0ded6}
+  .cell.t1{background:#5a4200;border-color:#d4a01a}
+  .cell.t1 .cname,.cell.t1 .cid{color:#ffd96e}
+  .cell.t2{background:#0a3540;border-color:#1a85a0}
+  .cell.t2 .cname,.cell.t2 .cid{color:#7ddcf0}
+  .cell.t3{background:#400a10;border-color:#b02a37}
+  .cell.t3 .cname,.cell.t3 .cid{color:#f8a0a8}
+  .info-pill{background:#2c2c2a;border-color:#555552;color:#b4b2a9}
+  .ring-label{color:#b4b2a9}
+  .hint{color:#888780}
+  .sep{background:#555552}
+  .trip-btn.none-btn{background:#2c2c2a;border-color:#555552;color:#b4b2a9}
+  .clear-btn{background:#2c2c2a;color:#f8a0a8;border-color:#555552}
 }
 </style>
 </head>
 <body>
 <div class="wrap">
-<h1>Snake grid navigator</h1>
+<h1>Snake Grid Navigator v2</h1>
 
-<div class="toolbar">
-  <span class="sec">Snake pattern</span>
-  <div class="btn-group" id="pattern-btns">
-    <button class="btn active" data-p="0" onclick="setPattern(0)">TL→H</button>
-    <button class="btn" data-p="1" onclick="setPattern(1)">TR→H</button>
-    <button class="btn" data-p="2" onclick="setPattern(2)">BL→H</button>
-    <button class="btn" data-p="3" onclick="setPattern(3)">BR→H</button>
-    <button class="btn" data-p="4" onclick="setPattern(4)">TL→V</button>
-    <button class="btn" data-p="5" onclick="setPattern(5)">TR→V</button>
-    <button class="btn" data-p="6" onclick="setPattern(6)">BL→V</button>
-    <button class="btn" data-p="7" onclick="setPattern(7)">BR→V</button>
-  </div>
-  <div class="sep"></div>
-  <span class="sec">Rotate grid</span>
-  <div class="btn-group">
+<!-- SNAKE PATTERN -->
+<div class="section">
+  <div class="section-title">Snake pattern</div>
+  <div class="row">
+    <div id="pattern-btns" class="row">
+      <button class="btn active" data-p="0" onclick="setPattern(0)">TL→H</button>
+      <button class="btn" data-p="1" onclick="setPattern(1)">TR→H</button>
+      <button class="btn" data-p="2" onclick="setPattern(2)">BL→H</button>
+      <button class="btn" data-p="3" onclick="setPattern(3)">BR→H</button>
+      <button class="btn" data-p="4" onclick="setPattern(4)">TL→V</button>
+      <button class="btn" data-p="5" onclick="setPattern(5)">TR→V</button>
+      <button class="btn" data-p="6" onclick="setPattern(6)">BL→V</button>
+      <button class="btn" data-p="7" onclick="setPattern(7)">BR→V</button>
+    </div>
+    <div class="sep"></div>
     <button class="btn" onclick="rotate(-1)">↺ CCW</button>
     <button class="btn" onclick="rotate(1)">↻ CW</button>
-    <button class="btn" onclick="resetRotation()">Reset</button>
+    <button class="btn" onclick="resetRotation()">Reset rot</button>
   </div>
 </div>
 
-<div class="shift-row">
-  <span class="sec">Shift</span>
-  <button class="btn" onclick="shift(-10)">−10</button>
-  <button class="btn" onclick="shift(-1)">−1</button>
-  <div class="shift-counter" id="shift-display">0</div>
-  <button class="btn" onclick="shift(1)">+1</button>
-  <button class="btn" onclick="shift(10)">+10</button>
-  <button class="btn" onclick="resetShift()">Reset</button>
-  <span class="mode-label" id="mode-label"></span>
+<!-- WHOLE-GRID SHIFT -->
+<div class="section">
+  <div class="section-title">Whole-grid shift</div>
+  <div class="row">
+    <button class="btn" onclick="shift(-10)">−10</button>
+    <button class="btn" onclick="shift(-1)">−1</button>
+    <div class="counter" id="shift-display">0</div>
+    <button class="btn" onclick="shift(1)">+1</button>
+    <button class="btn" onclick="shift(10)">+10</button>
+    <button class="btn" onclick="resetShift()">Reset</button>
+    <span class="hint" id="mode-label"></span>
+  </div>
 </div>
 
+<!-- RING ROTATIONS -->
+<div class="section">
+  <div class="section-title">Ring rotations (independent)</div>
+  <div id="ring-controls"></div>
+</div>
+
+<!-- HIGHLIGHT / TRIPS -->
+<div class="section">
+  <div class="section-title">Highlight cells — click a trip colour, then click cells on the grid</div>
+  <div class="trip-panel">
+    <button class="trip-btn none-btn sel" id="trip-none" onclick="selectTrip(null)">None</button>
+    <button class="trip-btn t1-btn" id="trip-1" onclick="selectTrip(1)">Trip 1</button>
+    <button class="trip-btn t2-btn" id="trip-2" onclick="selectTrip(2)">Trip 2</button>
+    <button class="trip-btn t3-btn" id="trip-3" onclick="selectTrip(3)">Trip 3</button>
+    <button class="clear-btn" onclick="clearHighlights()">Clear all</button>
+    <span class="hint">Highlights follow the cell (by room ID), not the grid position.</span>
+  </div>
+</div>
+
+<!-- GRID -->
 <div class="grid-wrap">
   <div class="grid" id="grid"></div>
 </div>
@@ -93,15 +154,42 @@ label.sec{font-size:11px;color:#73726c;white-space:nowrap}
 <script>
 const NAMES={0:'Simon',2:'Simon',3:'grey',4:'sliding',5:'fibonacci',6:'snake',7:'pairs',8:'memory',9:'maze',10:'precision',11:'flow',12:'tetris',13:'sudoku',14:'swap',15:'minesweeper',16:'train',17:'odd_one',18:'laser',19:'bridge',20:'mastermind',21:'hitori',22:'arkanoid',23:'klotski',24:'tile_2048',25:'fillomino',26:'tactical',27:'akari',28:'fishing',29:'binary',30:'invaders',31:'ring_ray',32:'whack_mole',33:'dice_bet',34:'concepto',35:'piano',36:'missile_cmd',37:'sonar',38:'reactor',39:'sun_dist',40:'knight',41:'slitherlink',42:'flappy',43:'network',44:'shell_monte',45:'fruit_ninja',46:'fast_food',47:'tents',48:'battleship',49:'futoshiki'};
 const N=7;
-const PATTERN_NAMES=['Top-left → horizontal','Top-right → horizontal','Bottom-left → horizontal','Bottom-right → horizontal','Top-left → vertical','Top-right → vertical','Bottom-left → vertical','Bottom-right → vertical'];
+const PATTERN_NAMES=['Top-left→H','Top-right→H','Bottom-left→H','Bottom-right→H','Top-left→V','Top-right→V','Bottom-left→V','Bottom-right→V'];
+
+// Ring definitions: ring 0 = outermost, ring 2 = innermost non-center
+// ring r: cells where max(row,col,N-1-row,N-1-col) === N-1-r
+function getRing(r){
+  const cells=[];
+  for(let row=0;row<N;row++) for(let col=0;col<N;col++){
+    if(row===3&&col===3) continue;
+    const d=Math.min(row,col,N-1-row,N-1-col);
+    if(d===r) cells.push([row,col]);
+  }
+  return cells;
+}
+// Ring cell counts
+const RINGS=[0,1,2].map(r=>getRing(r));
+// Ring rotation order (clockwise traversal of each ring)
+function ringCW(r){
+  const size=N-2*r;
+  const cells=[];
+  const top=r,bot=N-1-r,left=r,right=N-1-r;
+  for(let c=left;c<=right;c++) cells.push([top,c]);
+  for(let row=top+1;row<=bot;row++) cells.push([row,right]);
+  for(let c=right-1;c>=left;c--) cells.push([bot,c]);
+  for(let row=bot-1;row>=top+1;row--) cells.push([row,left]);
+  return cells.filter(([row,col])=>!(row===3&&col===3));
+}
+const RING_ORDERS=[[0,1,2].map(i=>ringCW(i)),null];
 
 function snakeH(variant){
   const cells=[];
   const startBottom=variant>=2,startRight=variant===1||variant===3;
-  const rows=startBottom?Array.from({length:N},(_,i)=>N-1-i):Array.from({length:N},(_,i)=>i);
+  const rows=startBottom?[...Array(N)].map((_,i)=>N-1-i):[...Array(N)].map((_,i)=>i);
   for(let ri=0;ri<rows.length;ri++){
     const r=rows[ri];
-    const cols=(startRight?(ri%2===0):(ri%2!==0))?Array.from({length:N},(_,i)=>N-1-i):Array.from({length:N},(_,i)=>i);
+    const goLeft=(startRight?(ri%2===0):(ri%2!==0));
+    const cols=goLeft?[...Array(N)].map((_,i)=>N-1-i):[...Array(N)].map((_,i)=>i);
     for(const c of cols){if(r===3&&c===3)continue;cells.push([r,c]);}
   }
   return cells;
@@ -109,59 +197,172 @@ function snakeH(variant){
 function snakeV(variant){
   const cells=[];
   const startRight=variant>=2,startBottom=variant===1||variant===3;
-  const cols=startRight?Array.from({length:N},(_,i)=>N-1-i):Array.from({length:N},(_,i)=>i);
+  const cols=startRight?[...Array(N)].map((_,i)=>N-1-i):[...Array(N)].map((_,i)=>i);
   for(let ci=0;ci<cols.length;ci++){
     const c=cols[ci];
-    const rows=(startBottom?(ci%2===0):(ci%2!==0))?Array.from({length:N},(_,i)=>N-1-i):Array.from({length:N},(_,i)=>i);
+    const goUp=(startBottom?(ci%2===0):(ci%2!==0));
+    const rows=goUp?[...Array(N)].map((_,i)=>N-1-i):[...Array(N)].map((_,i)=>i);
     for(const r of rows){if(r===3&&c===3)continue;cells.push([r,c]);}
   }
   return cells;
 }
 function makeSnake(p){return p<4?snakeH(p):snakeV(p-4);}
-function rotateGrid90CW(grid){const out=Array.from({length:N},()=>Array(N).fill(null));for(let r=0;r<N;r++)for(let c=0;c<N;c++)out[c][N-1-r]=grid[r][c];return out;}
-function applyRotation(grid,rot){let g=grid;const s=((rot%4)+4)%4;for(let i=0;i<s;i++)g=rotateGrid90CW(g);return g;}
-function shiftGrid(order,s){
+
+function rotateGrid90CW(grid){
+  const out=[...Array(N)].map(()=>Array(N).fill(null));
+  for(let r=0;r<N;r++) for(let c=0;c<N;c++) out[c][N-1-r]=grid[r][c];
+  return out;
+}
+function applyRotation(grid,rot){
+  let g=grid; const s=((rot%4)+4)%4;
+  for(let i=0;i<s;i++) g=rotateGrid90CW(g);
+  return g;
+}
+
+// Apply whole-grid shift to snake order
+function shiftSnake(order,s){
   const n=order.length,shifted=((s%n)+n)%n;
-  const out=Array.from({length:N},()=>Array(N).fill(null));
+  const out=[...Array(N)].map(()=>Array(N).fill(null));
   out[3][3]=0;
-  for(let i=0;i<n;i++){const destIdx=(i+shifted)%n;const[dr,dc]=order[destIdx];out[dr][dc]=i+2;}
+  for(let i=0;i<n;i++){const[dr,dc]=order[(i+shifted)%n];out[dr][dc]=i+2;}
   return out;
 }
 
-let currentPattern=0,currentShift=0,currentRotation=0,baseOrder=makeSnake(0);
+// Apply a ring rotation to a flat grid (returns new grid)
+function applyRingRot(grid,ringIdx,steps){
+  if(steps===0) return grid;
+  const order=RING_ORDERS[0][ringIdx];
+  const n=order.length;
+  const s=((steps%n)+n)%n;
+  const out=grid.map(r=>[...r]);
+  const ids=order.map(([r,c])=>grid[r][c]);
+  // rotate CW by s steps: cell at pos i gets value from pos (i-s+n)%n
+  for(let i=0;i<n;i++){
+    const[r,c]=order[i];
+    out[r][c]=ids[((i-s)+n*10)%n];
+  }
+  return out;
+}
+
+// State
+let currentPattern=0,currentShift=0,currentRotation=0;
+let ringSteps=[0,0,0]; // per ring
+let baseOrder=makeSnake(0);
+let selectedTrip=null;
+// highlights: Map from roomId -> Set of trip numbers
+const highlights=new Map();
+
+function getTripForId(id){
+  return highlights.get(id)||new Set();
+}
+
+// Build ring controls
+function buildRingControls(){
+  const el=document.getElementById('ring-controls');
+  el.innerHTML='';
+  const labels=['Outer ring (24 cells)','Middle ring (16 cells)','Inner ring (8 cells)'];
+  for(let i=0;i<3;i++){
+    const row=document.createElement('div');
+    row.className='ring-row';
+    const lbl=document.createElement('span');
+    lbl.className='ring-label';lbl.textContent=labels[i];
+    const bm10=btn('−10',()=>{ringSteps[i]-=10;renderRingLabel(i,ctr);render();});
+    const bm1=btn('−1',()=>{ringSteps[i]--;renderRingLabel(i,ctr);render();});
+    const ctr=document.createElement('div');ctr.className='counter';ctr.textContent='0';
+    const bp1=btn('+1',()=>{ringSteps[i]++;renderRingLabel(i,ctr);render();});
+    const bp10=btn('+10',()=>{ringSteps[i]+=10;renderRingLabel(i,ctr);render();});
+    const rst=btn('Reset',()=>{ringSteps[i]=0;renderRingLabel(i,ctr);render();});
+    [bm10,bm1,bp1,bp10,rst].forEach(b=>b.classList.add('sm'));
+    [lbl,bm10,bm1,ctr,bp1,bp10,rst].forEach(e=>row.appendChild(e));
+    el.appendChild(row);
+  }
+}
+function btn(txt,fn){const b=document.createElement('button');b.className='btn';b.textContent=txt;b.onclick=fn;return b;}
+function renderRingLabel(i,el){el.textContent=ringSteps[i];}
 
 function setPattern(p){
   currentPattern=p;baseOrder=makeSnake(p);
   document.querySelectorAll('#pattern-btns .btn').forEach(b=>b.classList.toggle('active',parseInt(b.dataset.p)===p));
   render();
 }
-function shift(d){currentShift+=d;render();}
-function resetShift(){currentShift=0;render();}
+function shift(d){currentShift+=d;document.getElementById('shift-display').textContent=currentShift;render();}
+function resetShift(){currentShift=0;document.getElementById('shift-display').textContent=0;render();}
 function rotate(d){currentRotation=((currentRotation+d)%4+4)%4;render();}
 function resetRotation(){currentRotation=0;render();}
 
+function selectTrip(t){
+  selectedTrip=t;
+  ['none','1','2','3'].forEach(id=>{
+    const el=document.getElementById('trip-'+(id==='none'?'none':id));
+    if(el) el.classList.toggle('sel',(t===null&&id==='none')||(t!==null&&String(t)===id));
+  });
+}
+function clearHighlights(){highlights.clear();render();}
+
 function render(){
-  document.getElementById('shift-display').textContent=currentShift;
   document.getElementById('mode-label').textContent=PATTERN_NAMES[currentPattern]+(currentRotation?` · ${currentRotation*90}° CW`:'');
-  let grid=shiftGrid(baseOrder,currentShift);
+
+  // Build grid: snake shift → ring rotations → grid rotation
+  let grid=shiftSnake(baseOrder,currentShift);
+  for(let i=0;i<3;i++) grid=applyRingRot(grid,i,ringSteps[i]);
   grid=applyRotation(grid,currentRotation);
+
   const el=document.getElementById('grid');el.innerHTML='';
-  for(let r=0;r<N;r++)for(let c=0;c<N;c++){
+  for(let r=0;r<N;r++) for(let c=0;c<N;c++){
     const id=grid[r][c];
     const div=document.createElement('div');
     let cls='cell';
-    if(id===0)cls+=' center-cell';
-    if(c===0)cls+=' west-edge';if(c===N-1)cls+=' east-edge';
-    if(r===0)cls+=' north-edge';if(r===N-1)cls+=' south-edge';
+    if(id===0) cls+=' center-cell';
+    if(c===0) cls+=' west-edge';
+    if(c===N-1) cls+=' east-edge';
+    if(r===0) cls+=' north-edge';
+    if(r===N-1) cls+=' south-edge';
+    if(id!==null&&id!==0){
+      const trips=getTripForId(id);
+      if(trips.has(1)) cls+=' t1';
+      if(trips.has(2)) cls+=' t2';
+      if(trips.has(3)) cls+=' t3';
+    }
     div.className=cls;
-    if(id!==null)div.innerHTML=`<span class="cid">#${id}</span><span class="cname">${NAMES[id]||'?'+id}</span>`;
+    if(id!==null){
+      const name=NAMES[id]||('?'+id);
+      div.innerHTML=`<span class="cid">#${id}</span><span class="cname">${name}</span>`;
+      if(id!==0){
+        div.onclick=()=>toggleHighlight(id);
+      }
+    }
     el.appendChild(div);
   }
+
+  // border info
   const west=[],east=[],north=[],south=[];
-  for(let r=0;r<N;r++){if(grid[r][0]!==null)west.push(NAMES[grid[r][0]]||grid[r][0]);if(grid[r][N-1]!==null)east.push(NAMES[grid[r][N-1]]||grid[r][N-1]);}
-  for(let c=0;c<N;c++){if(grid[0][c]!==null)north.push(NAMES[grid[0][c]]||grid[0][c]);if(grid[N-1][c]!==null)south.push(NAMES[grid[N-1][c]]||grid[N-1][c]);}
-  document.getElementById('info-row').innerHTML=[['W',west],['E',east],['N',north],['S',south]].map(([d,a])=>`<span class="info-pill"><b>${d}:</b> ${a.join(', ')}</span>`).join('');
+  for(let r=0;r<N;r++){
+    if(grid[r][0]!=null) west.push(NAMES[grid[r][0]]??grid[r][0]);
+    if(grid[r][N-1]!=null) east.push(NAMES[grid[r][N-1]]??grid[r][N-1]);
+  }
+  for(let c=0;c<N;c++){
+    if(grid[0][c]!=null) north.push(NAMES[grid[0][c]]??grid[0][c]);
+    if(grid[N-1][c]!=null) south.push(NAMES[grid[N-1][c]]??grid[N-1][c]);
+  }
+  document.getElementById('info-row').innerHTML=[['W',west],['E',east],['N',north],['S',south]]
+    .map(([d,a])=>`<span class="info-pill"><b>${d}:</b> ${a.join(', ')}</span>`).join('');
 }
+
+function toggleHighlight(id){
+  if(selectedTrip===null){
+    // erase all trips from this cell
+    highlights.delete(id);
+  } else {
+    if(!highlights.has(id)) highlights.set(id,new Set());
+    const s=highlights.get(id);
+    if(s.has(selectedTrip)) s.delete(selectedTrip);
+    else s.add(selectedTrip);
+    if(s.size===0) highlights.delete(id);
+  }
+  render();
+}
+
+buildRingControls();
 render();
 </script>
 </body>
