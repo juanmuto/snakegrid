@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Snake Grid Navigator v2</title>
+<title>Snake Grid Navigator v4</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:system-ui,sans-serif;background:#f5f5f2;color:#1a1a18;padding:16px;font-size:13px}
@@ -104,6 +104,7 @@ h1{font-size:15px;font-weight:600;margin-bottom:12px}
       <button class="btn" data-p="6" onclick="setPattern(6)">BL→V</button>
       <button class="btn" data-p="7" onclick="setPattern(7)">BR→V</button>
       <button class="btn" data-p="8" onclick="setPattern(8)">Spiral↻</button>
+      <button class="btn" data-p="9" onclick="setPattern(9)">Normal</button>
     </div>
     <div class="sep"></div>
     <button class="btn" onclick="rotate(-1)">↺ CCW</button>
@@ -160,7 +161,7 @@ h1{font-size:15px;font-weight:600;margin-bottom:12px}
 <script>
 const NAMES={0:'Simon',2:'Simon',3:'grey',4:'sliding',5:'fibonacci',6:'snake',7:'pairs',8:'memory',9:'maze',10:'precision',11:'flow',12:'tetris',13:'sudoku',14:'swap',15:'minesweeper',16:'train',17:'odd_one',18:'laser',19:'bridge',20:'mastermind',21:'hitori',22:'arkanoid',23:'klotski',24:'tile_2048',25:'fillomino',26:'tactical',27:'akari',28:'fishing',29:'binary',30:'invaders',31:'ring_ray',32:'whack_mole',33:'dice_bet',34:'concepto',35:'piano',36:'missile_cmd',37:'sonar',38:'reactor',39:'sun_dist',40:'knight',41:'slitherlink',42:'flappy',43:'network',44:'shell_monte',45:'fruit_ninja',46:'fast_food',47:'tents',48:'battleship',49:'futoshiki'};
 const N=7;
-const PATTERN_NAMES=['Top-left→H','Top-right→H','Bottom-left→H','Bottom-right→H','Top-left→V','Top-right→V','Bottom-left→V','Bottom-right→V','Spiral CW'];
+const PATTERN_NAMES=['Top-left→H','Top-right→H','Bottom-left→H','Bottom-right→H','Top-left→V','Top-right→V','Bottom-left→V','Bottom-right→V','Spiral CW','Normal'];
 
 // Ring definitions: ring 0 = outermost, ring 2 = innermost non-center
 // ring r: cells where max(row,col,N-1-row,N-1-col) === N-1-r
@@ -224,7 +225,12 @@ function spiralCW(){
   }
   return cells;
 }
-function makeSnake(p){if(p===8)return spiralCW();return p<4?snakeH(p):snakeV(p-4);}
+function normalOrder(){
+  const cells=[];
+  for(let r=0;r<N;r++) for(let c=0;c<N;c++) if(!(r===3&&c===3)) cells.push([r,c]);
+  return cells;
+}
+function makeSnake(p){if(p===8)return spiralCW();if(p===9)return normalOrder();return p<4?snakeH(p):snakeV(p-4);}
 
 function rotateGrid90CW(grid){
   const out=[...Array(N)].map(()=>Array(N).fill(null));
@@ -307,7 +313,7 @@ function spiralPush(d){
 function setPattern(p){
   currentPattern=p;baseOrder=makeSnake(p);
   document.querySelectorAll('#pattern-btns .btn').forEach(b=>b.classList.toggle('active',parseInt(b.dataset.p)===p));
-  document.getElementById('spiral-push-row').style.display=(p===8)?'flex':'none';
+  document.getElementById('spiral-push-row').style.display=(p===8)?'flex':'none';  
   render();
 }
 function shift(d){currentShift+=d;document.getElementById('shift-display').textContent=currentShift;render();}
