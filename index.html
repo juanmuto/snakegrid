@@ -103,6 +103,7 @@ h1{font-size:15px;font-weight:600;margin-bottom:12px}
       <button class="btn" data-p="5" onclick="setPattern(5)">TR→V</button>
       <button class="btn" data-p="6" onclick="setPattern(6)">BL→V</button>
       <button class="btn" data-p="7" onclick="setPattern(7)">BR→V</button>
+      <button class="btn" data-p="8" onclick="setPattern(8)">Spiral↻</button>
     </div>
     <div class="sep"></div>
     <button class="btn" onclick="rotate(-1)">↺ CCW</button>
@@ -122,6 +123,11 @@ h1{font-size:15px;font-weight:600;margin-bottom:12px}
     <button class="btn" onclick="shift(10)">+10</button>
     <button class="btn" onclick="resetShift()">Reset</button>
     <span class="hint" id="mode-label"></span>
+  </div>
+  <div class="row" id="spiral-push-row" style="margin-top:8px;display:none">
+    <button class="btn" id="spiral-push-btn" onclick="spiralPush(1)" style="font-size:12px;padding:5px 14px;font-weight:500">▶ Push spiral forward</button>
+    <button class="btn" onclick="spiralPush(-1)" style="font-size:12px;padding:5px 14px;font-weight:500">◀ Push back</button>
+    <span class="hint" id="spiral-topleft">Top-left: —</span>
   </div>
 </div>
 
@@ -154,7 +160,7 @@ h1{font-size:15px;font-weight:600;margin-bottom:12px}
 <script>
 const NAMES={0:'Simon',2:'Simon',3:'grey',4:'sliding',5:'fibonacci',6:'snake',7:'pairs',8:'memory',9:'maze',10:'precision',11:'flow',12:'tetris',13:'sudoku',14:'swap',15:'minesweeper',16:'train',17:'odd_one',18:'laser',19:'bridge',20:'mastermind',21:'hitori',22:'arkanoid',23:'klotski',24:'tile_2048',25:'fillomino',26:'tactical',27:'akari',28:'fishing',29:'binary',30:'invaders',31:'ring_ray',32:'whack_mole',33:'dice_bet',34:'concepto',35:'piano',36:'missile_cmd',37:'sonar',38:'reactor',39:'sun_dist',40:'knight',41:'slitherlink',42:'flappy',43:'network',44:'shell_monte',45:'fruit_ninja',46:'fast_food',47:'tents',48:'battleship',49:'futoshiki'};
 const N=7;
-const PATTERN_NAMES=['Top-left→H','Top-right→H','Bottom-left→H','Bottom-right→H','Top-left→V','Top-right→V','Bottom-left→V','Bottom-right→V'];
+const PATTERN_NAMES=['Top-left→H','Top-right→H','Bottom-left→H','Bottom-right→H','Top-left→V','Top-right→V','Bottom-left→V','Bottom-right→V','Spiral CW'];
 
 // Ring definitions: ring 0 = outermost, ring 2 = innermost non-center
 // ring r: cells where max(row,col,N-1-row,N-1-col) === N-1-r
@@ -206,7 +212,19 @@ function snakeV(variant){
   }
   return cells;
 }
-function makeSnake(p){return p<4?snakeH(p):snakeV(p-4);}
+function spiralCW(){
+  const cells=[];
+  let top=0,bot=N-1,left=0,right=N-1;
+  while(top<=bot&&left<=right){
+    for(let c=left;c<=right;c++) if(!(top===3&&c===3)) cells.push([top,c]);
+    for(let r=top+1;r<=bot;r++) if(!(r===3&&right===3)) cells.push([r,right]);
+    if(top<bot) for(let c=right-1;c>=left;c--) if(!(bot===3&&c===3)) cells.push([bot,c]);
+    if(left<right) for(let r=bot-1;r>=top+1;r--) if(!(r===3&&left===3)) cells.push([r,left]);
+    top++;bot--;left++;right--;
+  }
+  return cells;
+}
+function makeSnake(p){if(p===8)return spiralCW();return p<4?snakeH(p):snakeV(p-4);}
 
 function rotateGrid90CW(grid){
   const out=[...Array(N)].map(()=>Array(N).fill(null));
@@ -280,9 +298,16 @@ function buildRingControls(){
 function btn(txt,fn){const b=document.createElement('button');b.className='btn';b.textContent=txt;b.onclick=fn;return b;}
 function renderRingLabel(i,el){el.textContent=ringSteps[i];}
 
+function spiralPush(d){
+  currentShift+=d;
+  document.getElementById('shift-display').textContent=currentShift;
+  render();
+}
+
 function setPattern(p){
   currentPattern=p;baseOrder=makeSnake(p);
   document.querySelectorAll('#pattern-btns .btn').forEach(b=>b.classList.toggle('active',parseInt(b.dataset.p)===p));
+  document.getElementById('spiral-push-row').style.display=(p===8)?'flex':'none';
   render();
 }
 function shift(d){currentShift+=d;document.getElementById('shift-display').textContent=currentShift;render();}
@@ -306,6 +331,13 @@ function render(){
   let grid=shiftSnake(baseOrder,currentShift);
   for(let i=0;i<3;i++) grid=applyRingRot(grid,i,ringSteps[i]);
   grid=applyRotation(grid,currentRotation);
+
+  // Spiral top-left label
+  if(currentPattern===8){
+    const tlId=grid[0][0];
+    const tlName=tlId!==null?(NAMES[tlId]||('#'+tlId)):'—';
+    document.getElementById('spiral-topleft').textContent=`Top-left: #${tlId} ${tlName}`;
+  }
 
   const el=document.getElementById('grid');el.innerHTML='';
   for(let r=0;r<N;r++) for(let c=0;c<N;c++){
