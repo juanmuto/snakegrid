@@ -1,0 +1,4 @@
+Snake pattern (8 options): The two-letter code tells you the starting corner and primary direction — "TL→H" means the snake starts at the top-left and runs horizontally first, snaking down row by row. "BR→V" starts at the bottom-right and snakes vertically, column by column. The IDs (2–49) are assigned in that traversal order, and the center is always fixed at 0.
+Shift: Moves every room forward or backward through the snake sequence by that many steps, wrapping around. Use −1/+1 for fine control or −10/+10 to jump quickly. The shift is infinite in both directions.
+Rotate: Spins the entire current grid layout 90° CW or CCW. This is applied on top of the shift, so you can combine any pattern + shift + rotation freely.
+The border pills at the bottom show you exactly which rooms are on each edge at any moment — handy for matching against your "reached the western border" observations.
