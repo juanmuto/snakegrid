@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Snake Grid Navigator</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;background:#f5f5f2;color:#1a1a18;padding:16px}
+.wrap{max-width:700px;margin:0 auto}
+h1{font-size:16px;font-weight:500;margin-bottom:12px;color:#1a1a18}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;align-items:center}
+label.sec{font-size:11px;color:#73726c;white-space:nowrap}
+.btn-group{display:flex;gap:2px;flex-wrap:wrap}
+.btn{font-size:11px;padding:4px 9px;border:0.5px solid #b4b2a9;border-radius:6px;background:#fff;color:#1a1a18;cursor:pointer;white-space:nowrap;line-height:1.4}
+.btn:hover{background:#f1efe8}
+.btn.active{background:#e6f1fb;color:#185fa5;border-color:#85b7eb}
+.sep{width:0.5px;background:#d3d1c7;height:24px;margin:0 4px;align-self:center}
+.shift-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.shift-counter{font-size:13px;font-weight:500;min-width:60px;text-align:center}
+.grid-wrap{overflow-x:auto}
+.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;min-width:280px}
+.cell{border:0.5px solid #d3d1c7;border-radius:4px;padding:3px 2px;min-height:52px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;background:#f1efe8}
+.cell.center-cell{background:#eeedfe;border-color:#afa9ec}
+.cell .cid{font-size:9px;color:#888780;line-height:1.2}
+.cell .cname{font-size:9px;font-weight:500;color:#1a1a18;line-height:1.3;word-break:break-word}
+.cell.center-cell .cname{color:#3c3489}
+.cell.west-edge{border-left:2px solid #1D9E75}
+.cell.east-edge{border-right:2px solid #1D9E75}
+.cell.north-edge{border-top:2px solid #1D9E75}
+.cell.south-edge{border-bottom:2px solid #1D9E75}
+.info-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.info-pill{font-size:10px;padding:2px 8px;border-radius:99px;border:0.5px solid #d3d1c7;color:#5f5e5a;background:#fff}
+.mode-label{font-size:11px;font-weight:500;color:#185fa5;margin-left:4px}
+@media(prefers-color-scheme:dark){
+  body{background:#1c1c1a;color:#e0ded6}
+  .btn{background:#2c2c2a;color:#e0ded6;border-color:#444441}
+  .btn:hover{background:#3a3a38}
+  .btn.active{background:#0c447c;color:#b5d4f4;border-color:#378add}
+  .cell{background:#2c2c2a;border-color:#444441}
+  .cell .cname{color:#e0ded6}
+  .cell.center-cell{background:#26215c;border-color:#534ab7}
+  .cell.center-cell .cname{color:#cecbf6}
+  .cell .cid{color:#888780}
+  .info-pill{background:#2c2c2a;border-color:#444441;color:#b4b2a9}
+  .sep{background:#444441}
+  h1{color:#e0ded6}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>Snake grid navigator</h1>
+
+<div class="toolbar">
+  <span class="sec">Snake pattern</span>
+  <div class="btn-group" id="pattern-btns">
+    <button class="btn active" data-p="0" onclick="setPattern(0)">TL→H</button>
+    <button class="btn" data-p="1" onclick="setPattern(1)">TR→H</button>
+    <button class="btn" data-p="2" onclick="setPattern(2)">BL→H</button>
+    <button class="btn" data-p="3" onclick="setPattern(3)">BR→H</button>
+    <button class="btn" data-p="4" onclick="setPattern(4)">TL→V</button>
+    <button class="btn" data-p="5" onclick="setPattern(5)">TR→V</button>
+    <button class="btn" data-p="6" onclick="setPattern(6)">BL→V</button>
+    <button class="btn" data-p="7" onclick="setPattern(7)">BR→V</button>
+  </div>
+  <div class="sep"></div>
+  <span class="sec">Rotate grid</span>
+  <div class="btn-group">
+    <button class="btn" onclick="rotate(-1)">↺ CCW</button>
+    <button class="btn" onclick="rotate(1)">↻ CW</button>
+    <button class="btn" onclick="resetRotation()">Reset</button>
+  </div>
+</div>
+
+<div class="shift-row">
+  <span class="sec">Shift</span>
+  <button class="btn" onclick="shift(-10)">−10</button>
+  <button class="btn" onclick="shift(-1)">−1</button>
+  <div class="shift-counter" id="shift-display">0</div>
+  <button class="btn" onclick="shift(1)">+1</button>
+  <button class="btn" onclick="shift(10)">+10</button>
+  <button class="btn" onclick="resetShift()">Reset</button>
+  <span class="mode-label" id="mode-label"></span>
+</div>
+
+<div class="grid-wrap">
+  <div class="grid" id="grid"></div>
+</div>
+<div class="info-row" id="info-row"></div>
+</div>
+
+<script>
+const NAMES={0:'Simon',2:'Simon',3:'grey',4:'sliding',5:'fibonacci',6:'snake',7:'pairs',8:'memory',9:'maze',10:'precision',11:'flow',12:'tetris',13:'sudoku',14:'swap',15:'minesweeper',16:'train',17:'odd_one',18:'laser',19:'bridge',20:'mastermind',21:'hitori',22:'arkanoid',23:'klotski',24:'tile_2048',25:'fillomino',26:'tactical',27:'akari',28:'fishing',29:'binary',30:'invaders',31:'ring_ray',32:'whack_mole',33:'dice_bet',34:'concepto',35:'piano',36:'missile_cmd',37:'sonar',38:'reactor',39:'sun_dist',40:'knight',41:'slitherlink',42:'flappy',43:'network',44:'shell_monte',45:'fruit_ninja',46:'fast_food',47:'tents',48:'battleship',49:'futoshiki'};
+const N=7;
+const PATTERN_NAMES=['Top-left → horizontal','Top-right → horizontal','Bottom-left → horizontal','Bottom-right → horizontal','Top-left → vertical','Top-right → vertical','Bottom-left → vertical','Bottom-right → vertical'];
+
+function snakeH(variant){
+  const cells=[];
+  const startBottom=variant>=2,startRight=variant===1||variant===3;
+  const rows=startBottom?Array.from({length:N},(_,i)=>N-1-i):Array.from({length:N},(_,i)=>i);
+  for(let ri=0;ri<rows.length;ri++){
+    const r=rows[ri];
+    const cols=(startRight?(ri%2===0):(ri%2!==0))?Array.from({length:N},(_,i)=>N-1-i):Array.from({length:N},(_,i)=>i);
+    for(const c of cols){if(r===3&&c===3)continue;cells.push([r,c]);}
+  }
+  return cells;
+}
+function snakeV(variant){
+  const cells=[];
+  const startRight=variant>=2,startBottom=variant===1||variant===3;
+  const cols=startRight?Array.from({length:N},(_,i)=>N-1-i):Array.from({length:N},(_,i)=>i);
+  for(let ci=0;ci<cols.length;ci++){
+    const c=cols[ci];
+    const rows=(startBottom?(ci%2===0):(ci%2!==0))?Array.from({length:N},(_,i)=>N-1-i):Array.from({length:N},(_,i)=>i);
+    for(const r of rows){if(r===3&&c===3)continue;cells.push([r,c]);}
+  }
+  return cells;
+}
+function makeSnake(p){return p<4?snakeH(p):snakeV(p-4);}
+function rotateGrid90CW(grid){const out=Array.from({length:N},()=>Array(N).fill(null));for(let r=0;r<N;r++)for(let c=0;c<N;c++)out[c][N-1-r]=grid[r][c];return out;}
+function applyRotation(grid,rot){let g=grid;const s=((rot%4)+4)%4;for(let i=0;i<s;i++)g=rotateGrid90CW(g);return g;}
+function shiftGrid(order,s){
+  const n=order.length,shifted=((s%n)+n)%n;
+  const out=Array.from({length:N},()=>Array(N).fill(null));
+  out[3][3]=0;
+  for(let i=0;i<n;i++){const destIdx=(i+shifted)%n;const[dr,dc]=order[destIdx];out[dr][dc]=i+2;}
+  return out;
+}
+
+let currentPattern=0,currentShift=0,currentRotation=0,baseOrder=makeSnake(0);
+
+function setPattern(p){
+  currentPattern=p;baseOrder=makeSnake(p);
+  document.querySelectorAll('#pattern-btns .btn').forEach(b=>b.classList.toggle('active',parseInt(b.dataset.p)===p));
+  render();
+}
+function shift(d){currentShift+=d;render();}
+function resetShift(){currentShift=0;render();}
+function rotate(d){currentRotation=((currentRotation+d)%4+4)%4;render();}
+function resetRotation(){currentRotation=0;render();}
+
+function render(){
+  document.getElementById('shift-display').textContent=currentShift;
+  document.getElementById('mode-label').textContent=PATTERN_NAMES[currentPattern]+(currentRotation?` · ${currentRotation*90}° CW`:'');
+  let grid=shiftGrid(baseOrder,currentShift);
+  grid=applyRotation(grid,currentRotation);
+  const el=document.getElementById('grid');el.innerHTML='';
+  for(let r=0;r<N;r++)for(let c=0;c<N;c++){
+    const id=grid[r][c];
+    const div=document.createElement('div');
+    let cls='cell';
+    if(id===0)cls+=' center-cell';
+    if(c===0)cls+=' west-edge';if(c===N-1)cls+=' east-edge';
+    if(r===0)cls+=' north-edge';if(r===N-1)cls+=' south-edge';
+    div.className=cls;
+    if(id!==null)div.innerHTML=`<span class="cid">#${id}</span><span class="cname">${NAMES[id]||'?'+id}</span>`;
+    el.appendChild(div);
+  }
+  const west=[],east=[],north=[],south=[];
+  for(let r=0;r<N;r++){if(grid[r][0]!==null)west.push(NAMES[grid[r][0]]||grid[r][0]);if(grid[r][N-1]!==null)east.push(NAMES[grid[r][N-1]]||grid[r][N-1]);}
+  for(let c=0;c<N;c++){if(grid[0][c]!==null)north.push(NAMES[grid[0][c]]||grid[0][c]);if(grid[N-1][c]!==null)south.push(NAMES[grid[N-1][c]]||grid[N-1][c]);}
+  document.getElementById('info-row').innerHTML=[['W',west],['E',east],['N',north],['S',south]].map(([d,a])=>`<span class="info-pill"><b>${d}:</b> ${a.join(', ')}</span>`).join('');
+}
+render();
+</script>
+</body>
+</html>
