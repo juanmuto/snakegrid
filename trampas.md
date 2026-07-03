@@ -19,7 +19,7 @@ Izquierda 0, centro 1, derecha 2
 
 ## Knight round
 
-![[Pasted image 20260625131937.png]]
+<img width="702" height="677" alt="image" src="https://github.com/user-attachments/assets/32861dbf-34c7-40b0-9b3b-09c0eba64afa" />
 
 
 
@@ -121,7 +121,8 @@ runPairsAutoSolver();
 
 **Piano**
 
-![[Pasted image 20260627030503.png]]
+<img width="246" height="242" alt="image" src="https://github.com/user-attachments/assets/ff10db5c-fdf7-4347-ad81-5a06b6d3fc5b" />
+
 
 
 ## Concepto
@@ -138,7 +139,8 @@ The mechanics, from the code:
 
 Each structure type unlocks at a lifetime-earnings threshold, and costs scale up the more of that type you've already built (~17% per copy for most types).
 
-![[Pasted image 20260628154250.png]]
+<img width="632" height="605" alt="image" src="https://github.com/user-attachments/assets/32f2d15c-4bf1-4a3e-b8bb-ae2608b4e1b8" />
+
 Bottom line: with optimal play you can hit 165,000 in **about 5 minutes 45 seconds** of game time, using only ~14 manual clicks at the very start. I confirmed this by coding up the exact formulas from your file and running a search that, at every moment, picks whichever action (click, or buy X at position Y) minimizes total time to the goal.
 
 **The one insight that matters most:** amplifiers don't care about adjacency — they boost their _entire row and entire column_, and multiple amps stack multiplicatively. So the winning move is to dedicate one row and one column entirely to amps rather than scattering them. Every producer in that row or column gets ×2 per amp; a producer sitting at the intersection gets _both_ bonuses at once. Multipliers (which only help direct neighbors) and reactors are comparatively weak — multipliers are just useful cheap filler before amps unlock.
