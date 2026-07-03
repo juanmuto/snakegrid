@@ -227,7 +227,8 @@ gana solo
     function slash(x1, y1, x2, y2) {
         fire("pointerdown", x1, y1);
 
-        const steps = 12;
+        const steps = 8;
+
         for (let i = 1; i <= steps; i++) {
             const t = i / steps;
             fire(
@@ -262,11 +263,51 @@ gana solo
             if (!fruitNinjaEntityActive(entry, elapsed))
                 return;
 
+            // Avoid slicing the same fruit twice
+            const idx = fruitNinjaGridState.schedule.indexOf(entry);
+            if (fruitNinjaGridState.sliceSet.has(idx))
+                return;
+
+            // Is a bomb close to our intended slash?
+            let dangerous = false;
+
+            for (const other of fruitNinjaGridState.schedule) {
+
+                if (other.kind !== "bomb")
+                    continue;
+
+                const bombPos = fruitNinjaEntityPos(other, elapsed);
+
+                if (!bombPos)
+                    continue;
+
+                if (!fruitNinjaEntityActive(other, elapsed))
+                    continue;
+
+                const dist = fruitNinjaDistToSegment(
+                    bombPos.x,
+                    bombPos.y,
+                    pos.x - 0.03,
+                    pos.y,
+                    pos.x + 0.03,
+                    pos.y
+                );
+
+                if (dist < fruitNinjaGridState.hitRadius * 1.5) {
+                    dangerous = true;
+                    break;
+                }
+            }
+
+            if (dangerous)
+                return;
+
+            // Tiny horizontal slash
             slash(
-                pos.x - 0.08,
-                pos.y - 0.08,
-                pos.x + 0.08,
-                pos.y + 0.08
+                pos.x - 0.03,
+                pos.y,
+                pos.x + 0.03,
+                pos.y
             );
 
         });
