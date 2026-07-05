@@ -119,7 +119,7 @@ async function runPairsAutoSolver() {
 runPairsAutoSolver();
 ```
 
-**Piano**
+## Piano
 
 <img width="246" height="242" alt="image" src="https://github.com/user-attachments/assets/ff10db5c-fdf7-4347-ad81-5a06b6d3fc5b" />
 
@@ -185,7 +185,7 @@ Grid:
 ```
 
 
-gray scale
+## gray scale
 
 
 ```
@@ -195,7 +195,7 @@ Order from lightest to darkest.  Provde the coordinates starting on row and colu
 ```
 
 
-fruit ninja
+## fruit ninja
 
 pegar en dev tools -> consola con juego empezado
 gana solo
@@ -319,7 +319,7 @@ gana solo
 ```
 
 
-Binary
+## Binary
 
 
 ```
@@ -348,6 +348,38 @@ Solve the puzzle and give me:
 
 Here is the grid HTML:  
 `[PASTE HTML HERE]`
+```
+
+## Bridges
+
+
+Claude
+
+```
+This is a Hashiwokakero ("Bridges") puzzle, not the card game. Each numbered 
+island must be connected to other islands by a total number of bridges equal 
+to its number. Rules:
+
+1. Bridges run only horizontally or vertically — never diagonally.
+2. A bridge connects exactly two islands, with no other island in between.
+3. There can be at most 2 bridges between any given pair of islands.
+4. Bridges cannot cross each other or pass through other islands.
+5. All islands must end up connected into a single network (no isolated 
+   groups).
+
+Given the island positions and numbers below, solve the puzzle:
+1. List each island with its (row, col) position and number.
+2. Determine which pairs of islands are "adjacent" (same row or column, 
+   nothing in between).
+3. Work out how many bridges (0, 1, or 2) go on each possible edge so every 
+   island's total matches its number.
+4. Verify: no crossing bridges, and the whole graph is connected.
+5. Present the final answer as a diagram (islands as circles with their 
+   numbers, single lines for single bridges, double lines for double 
+   bridges) rather than just a table.
+
+Here is the puzzle:
+[paste the bridge-board HTML or island list here]
 ```
 
 
