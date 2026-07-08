@@ -189,9 +189,64 @@ Grid:
 
 
 ```
-Order from lightest to darkest.  Provde the coordinates starting on row and column 1, not 0
+// === Grey-scale cell autoclicker ===
+// Paste into the browser console while the puzzle is on screen.
 
-<div class="grey-grid"> COPIAR ELEMENTO
+function parseRgb(styleColor) {
+  // styleColor like "rgb(109, 109, 109)"
+  const m = styleColor.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
+  if (!m) return null;
+  return { r: +m[1], g: +m[2], b: +m[3] };
+}
+
+function getBrightness(cell) {
+  const rgb = parseRgb(cell.style.backgroundColor);
+  if (!rgb) return null; // e.g. the "central" cell with no background-color
+  // simple average; swap for luminance formula below if needed
+  return (rgb.r + rgb.g + rgb.b) / 3;
+}
+
+function collectSortedCells(selector = ".grey-cell") {
+  const cells = Array.from(document.querySelectorAll(selector));
+  const withBrightness = cells
+    .map((cell) => ({ cell, brightness: getBrightness(cell) }))
+    .filter((entry) => entry.brightness !== null); // skip cells with no color (e.g. "central")
+
+  // lightest first = highest brightness first
+  withBrightness.sort((a, b) => b.brightness - a.brightness);
+  return withBrightness;
+}
+
+function clickCell(cell) {
+  const rect = cell.getBoundingClientRect();
+  const opts = {
+    bubbles: true,
+    cancelable: true,
+    clientX: rect.left + rect.width / 2,
+    clientY: rect.top + rect.height / 2,
+  };
+  // Fire a realistic pointer+mouse sequence in case the game listens for either
+  cell.dispatchEvent(new PointerEvent("pointerdown", opts));
+  cell.dispatchEvent(new PointerEvent("pointerup", opts));
+  cell.dispatchEvent(new MouseEvent("click", opts));
+}
+
+async function playGreyscale({ delayMs = 150, selector = ".grey-cell" } = {}) {
+  const ordered = collectSortedCells(selector);
+  console.log(`Found ${ordered.length} cells. Clicking lightest -> darkest.`);
+  for (let i = 0; i < ordered.length; i++) {
+    const { cell, brightness } = ordered[i];
+    console.log(
+      `Click ${i + 1}/${ordered.length}: r=${cell.dataset.r}, c=${cell.dataset.c}, brightness=${brightness.toFixed(1)}`
+    );
+    clickCell(cell);
+    await new Promise((res) => setTimeout(res, delayMs));
+  }
+  console.log("Done.");
+}
+
+// Run it:
+playGreyscale();
 ```
 
 
