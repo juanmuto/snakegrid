@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Snake Grid Navigator v4</title>
+<title>Snake Grid Navigator v2</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:system-ui,sans-serif;background:#f5f5f2;color:#1a1a18;padding:16px;font-size:13px}
@@ -88,7 +88,7 @@ h1{font-size:15px;font-weight:600;margin-bottom:12px}
 </head>
 <body>
 <div class="wrap">
-<h1>Snake Grid Navigator v4</h1>
+<h1>Snake Grid Navigator v2</h1>
 
 <!-- SNAKE PATTERN -->
 <div class="section">
@@ -159,7 +159,7 @@ h1{font-size:15px;font-weight:600;margin-bottom:12px}
 </div>
 
 <script>
-const NAMES={0:'Simon',2:'Simon',3:'grey',4:'sliding',5:'fibonacci',6:'snake',7:'pairs',8:'memory',9:'maze',10:'precision',11:'flow',12:'tetris',13:'sudoku',14:'swap',15:'minesweeper',16:'train',17:'odd_one',18:'laser',19:'bridge',20:'mastermind',21:'hitori',22:'arkanoid',23:'klotski',24:'tile_2048',25:'fillomino',26:'tactical',27:'akari',28:'fishing',29:'binary',30:'invaders',31:'ring_ray',32:'whack_mole',33:'dice_bet',34:'concepto',35:'piano',36:'missile_cmd',37:'sonar',38:'reactor',39:'sun_dist',40:'knight',41:'slitherlink',42:'flappy',43:'network',44:'shell_monte',45:'fruit_ninja',46:'fast_food',47:'tents',48:'battleship',49:'futoshiki'};
+const NAMES={0:'Simon',1:'Simon',2:'grey',3:'sliding',4:'fibonacci',5:'snake',6:'pairs',7:'memory',8:'maze',9:'precision',10:'flow',11:'tetris',12:'sudoku',13:'swap',14:'minesweeper',15:'train',16:'odd_one',17:'laser',18:'bridge',19:'mastermind',20:'hitori',21:'arkanoid',22:'klotski',23:'tile_2048',24:'fillomino',25:'tactical',26:'akari',27:'fishing',28:'binary',29:'invaders',30:'ring_ray',31:'whack_mole',32:'dice_bet',33:'concepto',34:'piano',35:'missile_cmd',36:'sonar',37:'reactor',38:'sun_dist',39:'knight',40:'slitherlink',41:'flappy',42:'network',43:'shell_monte',44:'fruit_ninja',45:'fast_food',46:'tents',47:'battleship',48:'futoshiki'};
 const N=7;
 const PATTERN_NAMES=['Top-left→H','Top-right→H','Bottom-left→H','Bottom-right→H','Top-left→V','Top-right→V','Bottom-left→V','Bottom-right→V','Spiral CW','Normal'];
 
@@ -248,7 +248,7 @@ function shiftSnake(order,s){
   const n=order.length,shifted=((s%n)+n)%n;
   const out=[...Array(N)].map(()=>Array(N).fill(null));
   out[3][3]=0;
-  for(let i=0;i<n;i++){const[dr,dc]=order[(i+shifted)%n];out[dr][dc]=i+2;}
+  for(let i=0;i<n;i++){const[dr,dc]=order[(i+shifted)%n];out[dr][dc]=i+1;}
   return out;
 }
 
