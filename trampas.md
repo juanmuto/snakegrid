@@ -378,8 +378,104 @@ Given the island positions and numbers below, solve the puzzle:
    numbers, single lines for single bridges, double lines for double 
    bridges) rather than just a table.
 
+
 Here is the puzzle:
 [paste the bridge-board HTML or island list here]
+```
+
+## Sliding
+
+1 - Solve in this site: https://jweilhammer.github.io/sliding-puzzle-solver/
+2- Enter the solution in this code and paste in console
+
+```
+// === Sliding puzzle autoplayer ===
+// Paste into the browser console while the puzzle is on screen.
+
+// 1) Paste your move list here as the raw text you were given:
+const MOVE_TEXT = `
+1: DOWN
+2: DOWN
+3: LEFT
+4: UP
+5: RIGHT
+... (paste the full list)
+`;
+
+// 2) Parse "N: DIRECTION" lines into an ordered array of directions
+function parseMoves(text) {
+  return text
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line) => {
+      const m = line.match(/^\d+:\s*(UP|DOWN|LEFT|RIGHT)$/i);
+      if (!m) throw new Error("Bad move line: " + line);
+      return m[1].toUpperCase();
+    });
+}
+
+// Offset of the tile (relative to empty) that must be clicked for a given
+// "empty moves in this direction" instruction.
+const DIR_TO_TILE_OFFSET = {
+  DOWN:  { dr:  1, dc:  0 }, // tile below empty slides up
+  UP:    { dr: -1, dc:  0 }, // tile above empty slides down
+  RIGHT: { dr:  0, dc:  1 }, // tile right of empty slides left
+  LEFT:  { dr:  0, dc: -1 }, // tile left of empty slides right
+};
+
+function findEmpty() {
+  const cellMap = slidingCellMap(slidingGridState.cells);
+  const { empty } = slidingEmptyAndAdjacent(cellMap);
+  return empty;
+}
+
+function waitForUnlock(timeoutMs = 5000) {
+  return new Promise((resolve, reject) => {
+    const start = Date.now();
+    const iv = setInterval(() => {
+      if (!slidingGridState || !slidingGridState.locked) {
+        clearInterval(iv);
+        resolve();
+      } else if (Date.now() - start > timeoutMs) {
+        clearInterval(iv);
+        reject(new Error("Timed out waiting for click result"));
+      }
+    }, 30);
+  });
+}
+
+async function playMoves(moves, { delayMs = 120 } = {}) {
+  for (let i = 0; i < moves.length; i++) {
+    const dir = moves[i];
+    const empty = findEmpty();
+    if (!empty) throw new Error("No empty cell found at move " + (i + 1));
+
+    const off = DIR_TO_TILE_OFFSET[dir];
+    const r = empty.r + off.dr;
+    const c = empty.c + off.dc;
+
+    if (r < 0 || r > 6 || c < 0 || c > 6) {
+      throw new Error(`Move ${i + 1} (${dir}) goes out of bounds from empty (${empty.r},${empty.c})`);
+    }
+
+    // Wait until previous click resolved (locked === false)
+    if (slidingGridState.locked) {
+      await waitForUnlock();
+    }
+
+    console.log(`Move ${i + 1}: ${dir} -> clicking tile at (${r}, ${c})`);
+    onSlidingCellClick(r, c);
+
+    // small pacing delay before checking lock state again, plus wait for unlock
+    await new Promise((res) => setTimeout(res, delayMs));
+    await waitForUnlock();
+  }
+  console.log("All moves sent.");
+}
+
+// 3) Run it:
+playMoves(parseMoves(MOVE_TEXT));
 ```
 
 
