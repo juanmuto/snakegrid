@@ -189,60 +189,61 @@ Grid:
 
 
 ```
-// === Grey-scale cell autoclicker ===
-// Paste into the browser console while the puzzle is on screen.
-
-function parseRgb(styleColor) {
-  // styleColor like "rgb(109, 109, 109)"
-  const m = styleColor.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
-  if (!m) return null;
-  return { r: +m[1], g: +m[2], b: +m[3] };
+function waitForGreyUnlock(timeoutMs = 5000) {
+  return new Promise((resolve, reject) => {
+    const start = Date.now();
+    const iv = setInterval(() => {
+      if (!greyGridState || !greyGridState.locked) {
+        clearInterval(iv);
+        resolve();
+      } else if (Date.now() - start > timeoutMs) {
+        clearInterval(iv);
+        reject(new Error("Timed out waiting for grey grid click result"));
+      }
+    }, 30);
+  });
 }
 
-function getBrightness(cell) {
-  const rgb = parseRgb(cell.style.backgroundColor);
-  if (!rgb) return null; // e.g. the "central" cell with no background-color
-  // simple average; swap for luminance formula below if needed
-  return (rgb.r + rgb.g + rgb.b) / 3;
-}
+async function playGreyscale({ selector = ".grey-cell" } = {}) {
+  let step = 0;
 
-function collectSortedCells(selector = ".grey-cell") {
-  const cells = Array.from(document.querySelectorAll(selector));
-  const withBrightness = cells
-    .map((cell) => ({ cell, brightness: getBrightness(cell) }))
-    .filter((entry) => entry.brightness !== null); // skip cells with no color (e.g. "central")
-
-  // lightest first = highest brightness first
-  withBrightness.sort((a, b) => b.brightness - a.brightness);
-  return withBrightness;
-}
-
-function clickCell(cell) {
-  const rect = cell.getBoundingClientRect();
-  const opts = {
-    bubbles: true,
-    cancelable: true,
-    clientX: rect.left + rect.width / 2,
-    clientY: rect.top + rect.height / 2,
-  };
-  // Fire a realistic pointer+mouse sequence in case the game listens for either
-  cell.dispatchEvent(new PointerEvent("pointerdown", opts));
-  cell.dispatchEvent(new PointerEvent("pointerup", opts));
-  cell.dispatchEvent(new MouseEvent("click", opts));
-}
-
-async function playGreyscale({ delayMs = 150, selector = ".grey-cell" } = {}) {
-  const ordered = collectSortedCells(selector);
-  console.log(`Found ${ordered.length} cells. Clicking lightest -> darkest.`);
-  for (let i = 0; i < ordered.length; i++) {
-    const { cell, brightness } = ordered[i];
-    console.log(
-      `Click ${i + 1}/${ordered.length}: r=${cell.dataset.r}, c=${cell.dataset.c}, brightness=${brightness.toFixed(1)}`
+  while (true) {
+    const cells = Array.from(
+      document.querySelectorAll(`${selector}:not(.central):not(.done)`)
     );
-    clickCell(cell);
-    await new Promise((res) => setTimeout(res, delayMs));
+
+    const withBrightness = cells
+      .map((cell) => {
+        const rgb = parseRgb(cell.style.backgroundColor);
+        return rgb ? { cell, brightness: (rgb.r + rgb.g + rgb.b) / 3 } : null;
+      })
+      .filter(Boolean);
+
+    if (withBrightness.length === 0) {
+      console.log("No more cells to click. Done.");
+      break;
+    }
+
+    withBrightness.sort((a, b) => b.brightness - a.brightness);
+    const { cell, brightness } = withBrightness[0];
+    const row = Number(cell.dataset.r);
+    const col = Number(cell.dataset.c);
+
+    step++;
+    console.log(`Click ${step}: r=${row}, c=${col}, brightness=${brightness.toFixed(1)}`);
+
+    // Wait for previous click to resolve, just in case
+    if (greyGridState.locked) await waitForGreyUnlock();
+
+    onGreyCellClick(cell, row, col);
+    await waitForGreyUnlock();
+
+    // Check whether that click was actually correct before continuing
+    if (cell.classList.contains("fail-flash")) {
+      console.error(`Click ${step} was WRONG (r=${row}, c=${col}). Stopping — order assumption is off.`);
+      break;
+    }
   }
-  console.log("Done.");
 }
 
 // Run it:
