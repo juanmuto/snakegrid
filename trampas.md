@@ -537,3 +537,8 @@ playMoves(parseMoves(MOVE_TEXT));
 ```
 
 
+
+## Mastermind
+
+✗,○,✓,□,△,★
+https://nebupookins.github.io/JS-Mastermind-Solver/
