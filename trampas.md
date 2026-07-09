@@ -164,6 +164,8 @@ https://www.kakuro-online.com/slitherlink/
 
 ## Sudoku Battleship
 
+https://logic-puzzles-online.com/tools/battleship-solver/
+
 Para IA ()
 ```
 Solve this 7x7 battleship sudoku game.
