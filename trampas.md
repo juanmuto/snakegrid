@@ -542,3 +542,11 @@ playMoves(parseMoves(MOVE_TEXT));
 
 ✗,○,✓,□,△,★
 https://nebupookins.github.io/JS-Mastermind-Solver/
+
+## calcudoku
+
+https://billabob.github.io/kenkensolver/kenkensolver.html
+
+# fillomino
+
+https://www.kakuro-online.com/fillomino/
