@@ -544,9 +544,42 @@ playMoves(parseMoves(MOVE_TEXT));
 https://nebupookins.github.io/JS-Mastermind-Solver/
 
 ## calcudoku
-
 https://billabob.github.io/kenkensolver/kenkensolver.html
+
+## Arkanoid 
+Paste this in the console while a game is active:
+```
+jsif (window._paddleCheatId) cancelAnimationFrame(window._paddleCheatId);
+
+function paddleCheatLoop() {
+  const gs = arkanoidGridState;
+  if (gs && !gs.gameOver && !gs.awaitingRestart) {
+    const w = arkanoidPaddleWidth(gs);
+    const targetCol = Math.max(0, Math.min(ARK_GRID - w, gs.ball.c - Math.floor(w / 2)));
+    gs.paddleCol = targetCol;
+    gs.displayPaddleCol = targetCol;
+    gs.paddleSlot = Math.round(targetCol / ARK_UNIT); // keep slot roughly in sync
+  }
+  window._paddleCheatId = requestAnimationFrame(paddleCheatLoop);
+}
+paddleCheatLoop();
+```
+
+
+To stop it:
+```
+jscancelAnimationFrame(window._paddleCheatId);
+window._paddleCheatId = null;
+```
 
 # fillomino
 
 https://www.kakuro-online.com/fillomino/
+
+@ 2048
+
+```
+window.TILE_2048_SLIDE_MS = 150;       // duration of slide animation, ms
+window.TILE_2048_SPAWN_POP_MS = 120;   // pop-in delay for new tile, ms
+window.TILE_2048_SPAWN_FOUR_PROB = 0.1; // probability a new tile is a 4 instead of 2
+```
