@@ -576,7 +576,7 @@ window._paddleCheatId = null;
 
 https://www.kakuro-online.com/fillomino/
 
-@ 2048
+# 2048
 
 ```
 window.TILE_2048_SLIDE_MS = 150;       // duration of slide animation, ms
